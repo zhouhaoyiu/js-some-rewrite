@@ -1,15 +1,26 @@
 const utilsModule = ((Function) => {
+
+  /**
+   * 
+   * @param ctx  为待绑定的this,执行上下文
+   * @param ctx.originFn 待绑定的函数 与this绑定
+   * @param this 调用此方法函数体
+   * @returns ret 使用绑定了ctx的this并且使用传入的参数执行的原函数结果
+   */
   Function.prototype.myCall = function (ctx) {
-    ctx = ctx ? Object(ctx) : window
-    ctx.originFn = this
+    console.log(ctx)
+    console.log("this", this)
+    ctx = ctx ? Object(ctx) : window // 如果传入的上下文为空,则使用window
+    ctx.originFn = this // 将当前函数赋值给上下文的originFn
     let args = [];
     for (var i = 1; i < arguments.length; i++) {
       // console.log(arguments[i])
       args.push('arguments[' + i + ']')
-    }
-    console.log(args.toString())
-    let ret = eval('ctx.originFn(' + args + ')')
-    delete ctx.originFn
+    } // 将arguments转换为字符串
+    console.log(args)
+    let ret = eval('ctx.originFn(' + args + ')') // 此时this为ctx,所以调用ctx.originFn(arguments)时可以打印出ctx中的属性并且使用eval将原函数体调用传入的参数执行
+    delete ctx.originFn // 删除originFn
+    console.log(ret)
 
     return ret
   }
@@ -26,6 +37,7 @@ const utilsModule = ((Function) => {
       return ctx.originFn()
     }
 
+    // 将传入的参数转换为字符串并且绑定this的上下文调用
     let ret = eval('ctx.originFn(' + args + ')')
     delete ctx.originFn
     return ret
@@ -40,17 +52,43 @@ const utilsModule = ((Function) => {
       '[object Array]': 'Array',
       '[object Number]': 'Number',
       '[object String]': 'String',
-      '[object Boolean]': 'Boolean'
+      '[object Boolean]': 'Boolean',
+      '[object Function]': 'Function',
+      '[object Date]': 'Date',
+      '[object RegExp]': 'RegExp',
+      '[object Error]': 'Error',
+      '[object Arguments]': 'Arguments',
+      '[object Promise]': 'Promise',
+      '[object Map]': 'Map',
+      '[object Set]': 'Set',
+      '[object WeakMap]': 'WeakMap',
+      '[object WeakSet]': 'WeakSet',
+      '[object Symbol]': 'Symbol',
+      '[object ArrayBuffer]': 'ArrayBuffer',
+      '[object DataView]': 'DataView',
+      '[object Float32Array]': 'Float32Array',
+      '[object Float64Array]': 'Float64Array',
+      '[object Int8Array]': 'Int8Array',
+      '[object Int16Array]': 'Int16Array',
+      '[object Int32Array]': 'Int32Array',
+      '[object Uint8Array]': 'Uint8Array',
+      '[object Uint16Array]': 'Uint16Array',
+      '[object Uint32Array]': 'Uint32Array',
+      '[object Uint8ClampedArray]': 'Uint8ClampedArray',
     }[({}).toString.call(value)] : typeof (value)
   }
 
   Function.prototype.myBind = function (ctx) {
     var originFn = this
+    // bind传递的参数
     var args = [].slice.call(arguments, 1)
     var _tempFn = function () { }
 
     var newFn = function () {
+      // 返回的新函数传递的参数
       var newArgs = [].slice.call(arguments)
+      console.log('this', this)
+      console.log('ctx', ctx)
       return originFn.apply(this instanceof newFn ? this : ctx, args.concat(newArgs))
     }
 
@@ -60,6 +98,7 @@ const utilsModule = ((Function) => {
   }
 
   function myNew() {
+    // arguments[0] 为构造函数
     var constructor = [].shift.call(arguments)
     var _this = {}
 
@@ -74,11 +113,11 @@ const utilsModule = ((Function) => {
     type = type.prototype
     target = target.__proto__
 
-    while(true){
-      if(target === null){
+    while (true) {
+      if (target === null) {
         return false
       }
-      if(target === type){
+      if (target === type) {
         return true
       }
       target = target.__proto__
