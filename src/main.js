@@ -76,3 +76,4 @@ console.log(newY.mylove)
 // console.log(test instanceof Test)
 // console.log(instanceOf(test, Test))
 // console.log(instanceOf([], Object))
+

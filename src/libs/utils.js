@@ -1,4 +1,4 @@
-const utilsModule = ((Function) => {
+const utilsModule = ((Function, Array) => {
 
   /**
    * 
@@ -108,6 +108,19 @@ const utilsModule = ((Function) => {
     // return _this
   }
 
+  function deepClone(obj) {
+    if (typeof obj !== 'object' || obj === null) {
+      return obj
+    }
+    var newObj = {}
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        newObj[key] = deepClone(obj[key])
+      }
+    }
+    return newObj
+  }
+
   function instanceOf(target, type) {
     console.log(target, type)
     type = type.prototype
@@ -124,12 +137,117 @@ const utilsModule = ((Function) => {
     }
   }
 
+  Array.prototype.myForEach = function (cb) {
+    var _arr = this;
+    var _len = _arr.length;
+    var _arg2 = arguments[1] || window;
+
+    for (var i = 0; i < _len; i++) {
+      cb.apply(_arg2, [_arr[i], i, _arr])
+    }
+  }
+  Array.prototype.myMap = function (cb) {
+    var _arr = this;
+    var _len = _arr.length;
+    var _arg2 = arguments[1] || window;
+    var _newArr = [];
+    var _item;
+    var _res
+
+    for (var i = 0; i < _len; i++) {
+      _item = deepClone(_arr[i]);
+      _res = cb.apply(_arg2, [_item, i, _arr])
+      _newArr.push(_res)
+    }
+    return _newArr
+  }
+
+  Array.prototype.myFilter = function (cb) {
+    var _arr = this;
+    var _len = _arr.length;
+    var _arg2 = arguments[1] || window;
+    var _newArr = [];
+    var _item;
+    var _res
+
+    for (var i = 0; i < _len; i++) {
+      _item = deepClone(_arr[i]);
+      _res = cb.apply(_arg2, [_item, i, _arr])
+      _res && _newArr.push(_item)
+    }
+    return _newArr
+
+  }
+
+  Array.prototype.myEvery = function (cb) {
+    var _arr = this; // 原数组
+    var _len = _arr.length; // 原数组长度
+    var _arg2 = arguments[1] || window; // 可选参数  对象作为该执行回调时使用，传递给函数，用作 "this" 的值。
+    var _item; // 循环变量
+    var _res
+
+    console.log('_arg2', _arg2)
+
+    for (var i = 0; i < _len; i++) {
+      _item = deepClone(_arr[i]);
+      _res = cb.apply(_arg2, [_item, i, _arr]) // 回调函数执行结果
+      if (!_res) {
+        return false
+      }
+    }
+    return true
+  }
+
+  Array.prototype.mySome = function (cb) {
+    var _arr = this; // 原数组
+    var _len = _arr.length; // 原数组长度
+    var _arg2 = arguments[1] || window; // 可选参数  对象作为该执行回调时使用，传递给函数，用作 "this" 的值。
+    var _item; // 循环变量
+    var _res
+
+    for (var i = 0; i < _len; i++) {
+      _item = deepClone(_arr[i]);
+      _res = cb.apply(_arg2, [_item, i, _arr]) // 回调函数执行结果
+      if (_res) {
+        return true
+      }
+    }
+    return false
+  }
+
+  Array.prototype.myReduce = function (cb, initVal) {
+    var _arr = this; // 原数组
+    var _len = _arr.length; // 原数组长度
+    var _arg3 = arguments[2] || window; // 可选参数  对象作为该执行回调时使用，传递给函数，用作 "this" 的值。
+    var _item
+
+    for (var i = 0; i < _len; i++) {
+      _item = deepClone(_arr[i]);
+      initVal = cb.apply(_arg3, [initVal, _item, i, _arr])
+    }
+    return initVal
+  }
+
+  Array.prototype.myReduceRight = function (cb, initVal) {
+    var _arr = this; // 原数组
+    var _len = _arr.length; // 原数组长度
+    var _arg3 = arguments[2] || window; // 可选参数  对象作为该执行回调时使用，传递给函数，用作 "this" 的值。
+    var _item
+
+    for (var i = _len - 1; i >= 0; i--) {
+      _item = deepClone(_arr[i]);
+      initVal = cb.apply(_arg3, [initVal, _item, i, _arr])
+    }
+    return initVal
+  }
+
+
   return {
     typeOf,
     myNew,
     instanceOf
   }
-})(Function)
+})(Function, Array)
 
 
 
