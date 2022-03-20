@@ -1,6 +1,6 @@
 # js-some-rewrite
 
-## src/index.js
+## src/llibs/utils.js
 
 - bind
 - call
