@@ -14,3 +14,4 @@
 - some
 - reduce
 - typeof
+- deepClone
