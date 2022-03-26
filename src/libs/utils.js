@@ -241,11 +241,68 @@ const utilsModule = ((Function, Array) => {
     return initVal
   }
 
+  class MyPromise {
+    constructor(exeuctor) {
+      this.status = 'Pending'; // pending fulfilled rejected
+      this.value = undefined;
+      this.reason = undefined;
+
+      this.onResolvedCallbacks = []; // 存储成功回调函数
+      this.onRejectedCallbacks = []; // 存储失败回调函数
+
+      const resolve = (value) => {
+        if (this.status === 'Pending') {
+          this.status = 'Fullfilled';
+          this.value = value;
+          this.onResolvedCallbacks.forEach(fn => fn());
+        }
+      }
+
+      const reject = (reason) => {
+        if (this.status === 'Pending') {
+          this.status = 'Rejected'
+          this.reason = reason
+          this.onRejectedCallbacks.forEach(fn => fn())
+        }
+      }
+      try {
+        exeuctor(resolve, reject)
+      }
+      catch (e) {
+        reject(e)
+      }
+    }
+    then(onFulfilled, onRejected) {
+      if (this.status === 'Fullfilled') {
+        onFulfilled(this.value)
+      }
+      if (this.status === 'Rejected') {
+        onRejected(this.reason)
+      }
+      if (this.status === 'Pending') {
+        this.onResolvedCallbacks.push(() => {
+          onFulfilled(this.value)
+        })
+        this.onRejectedCallbacks.push(() => {
+          onRejected(this.reason)
+        })
+      }
+
+    }
+    catch(onRejected) {
+      this.then(undefined, onRejected)
+    }
+
+
+  }
+
 
   return {
     typeOf,
     myNew,
-    instanceOf
+    instanceOf,
+    deepClone,
+    MyPromise,
   }
 })(Function, Array)
 
